@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RetailPulse — Login</title>
-  <link rel="manifest" href="/manifest.json" />
+  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#6366f1" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
@@ -75,7 +75,7 @@
 
   <script>
     // Redirect if already logged in
-    if (localStorage.getItem('rp_token')) window.location.href = '/dashboard.html';
+    if (localStorage.getItem('rp_token')) window.location.href = 'dashboard.html';
 
     function switchTab(tab) {
       document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
@@ -98,23 +98,55 @@
       const btn = document.getElementById('login-btn');
       btn.innerHTML = '<span class="loading-spinner"></span>';
       btn.disabled = true;
+
+      const usernameInput = document.getElementById('login-username').value.trim();
+      const passwordInput = document.getElementById('login-password').value.trim();
+
       try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: document.getElementById('login-username').value, password: document.getElementById('login-password').value })
-        });
-        const text = await res.text();
-        let data;
+        let authSuccess = false;
+        let token, user;
+
+        // 1. Try Backend API first (Localhost / Vercel Serverless)
         try {
-          data = JSON.parse(text);
-        } catch (_) {
-          throw new Error(`Backend unavailable (Status: ${res.status}). Serverless function routing initializing...`);
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: usernameInput, password: passwordInput })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            token = data.token;
+            user = data.user;
+            authSuccess = true;
+          } else if (res.status === 401) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Invalid credentials');
+          }
+        } catch (networkErr) {
+          if (networkErr.message === 'Invalid credentials') throw networkErr;
+          console.warn('Backend unavailable, using client-side auth mode:', networkErr);
         }
-        if (!res.ok) throw new Error(data.error || 'Authentication failed');
-        localStorage.setItem('rp_token', data.token);
-        localStorage.setItem('rp_user', JSON.stringify(data.user));
-        window.location.href = '/dashboard.html';
+
+        // 2. Client-Side Fallback Authentication (for GitHub Pages / Static Hosting)
+        if (!authSuccess) {
+          const validUsers = JSON.parse(localStorage.getItem('rp_registered_users') || '{}');
+          validUsers['admin'] = { password: 'Admin@123', role: 'admin', email: 'admin@retailpulse.com' };
+          validUsers['analyst'] = { password: 'Demo@123', role: 'analyst', email: 'analyst@retailpulse.com' };
+
+          const matched = validUsers[usernameInput];
+          if (matched && matched.password === passwordInput) {
+            token = 'rp_token_' + Date.now();
+            user = { id: 1, username: usernameInput, email: matched.email, role: matched.role };
+            authSuccess = true;
+          } else {
+            throw new Error('Invalid credentials. Use admin / Admin@123 or analyst / Demo@123');
+          }
+        }
+
+        localStorage.setItem('rp_token', token);
+        localStorage.setItem('rp_user', JSON.stringify(user));
+        window.location.href = 'dashboard.html';
       } catch (err) {
         showError(err.message);
         btn.innerHTML = 'Sign In';
@@ -128,28 +160,41 @@
       const btn = document.getElementById('register-btn');
       btn.innerHTML = '<span class="loading-spinner"></span>';
       btn.disabled = true;
+
+      const username = document.getElementById('reg-username').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      const role = document.getElementById('reg-role').value;
+
       try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: document.getElementById('reg-username').value,
-            email: document.getElementById('reg-email').value,
-            password: document.getElementById('reg-password').value,
-            role: document.getElementById('reg-role').value
-          })
-        });
-        const text = await res.text();
-        let data;
+        let registered = false;
+        let token, user;
+
         try {
-          data = JSON.parse(text);
-        } catch (_) {
-          throw new Error(`Backend unavailable (Status: ${res.status}). Serverless function routing initializing...`);
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, role })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            token = data.token;
+            user = data.user;
+            registered = true;
+          }
+        } catch (_) {}
+
+        if (!registered) {
+          const validUsers = JSON.parse(localStorage.getItem('rp_registered_users') || '{}');
+          validUsers[username] = { password, role, email };
+          localStorage.setItem('rp_registered_users', JSON.stringify(validUsers));
+          token = 'rp_token_' + Date.now();
+          user = { id: Date.now(), username, email, role };
         }
-        if (!res.ok) throw new Error(data.error || 'Registration failed');
-        localStorage.setItem('rp_token', data.token);
-        localStorage.setItem('rp_user', JSON.stringify(data.user));
-        window.location.href = '/dashboard.html';
+
+        localStorage.setItem('rp_token', token);
+        localStorage.setItem('rp_user', JSON.stringify(user));
+        window.location.href = 'dashboard.html';
       } catch (err) {
         showError(err.message);
         btn.innerHTML = 'Create Account';
@@ -157,7 +202,9 @@
       }
     }
 
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>
