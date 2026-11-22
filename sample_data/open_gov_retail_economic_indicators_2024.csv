@@ -1,0 +1,21 @@
+report_period,governing_authority,indicator_code,indicator_name,retail_sector,open_gov_index_value,growth_rate_mom,sample_size_stores,validation_status
+2024-09,US Census Bureau (MRTS),MRTS-44-45,Monthly Retail & Food Services,All Retailing,704882.00,+0.4%,12500,Empirically Validated
+2024-09,US Census Bureau (MRTS),MRTS-443,Electronics and Appliance Stores,Electronics,7842.00,+0.6%,3400,Empirically Validated
+2024-09,US Census Bureau (MRTS),MRTS-448,Clothing and Clothing Accessories,Apparel,25610.00,+0.8%,4800,Empirically Validated
+2024-09,US Census Bureau (MRTS),MRTS-445,Food and Beverage Stores,Groceries,82450.00,+0.3%,5100,Empirically Validated
+2024-10,US Census Bureau (MRTS),MRTS-44-45,Monthly Retail & Food Services,All Retailing,718945.00,+0.8%,12500,Empirically Validated
+2024-10,US Census Bureau (MRTS),MRTS-443,Electronics and Appliance Stores,Electronics,8120.00,+3.5%,3400,Empirically Validated
+2024-10,US Census Bureau (MRTS),MRTS-448,Clothing and Clothing Accessories,Apparel,26890.00,+5.0%,4800,Empirically Validated
+2024-10,US Census Bureau (MRTS),MRTS-445,Food and Beverage Stores,Groceries,83210.00,+0.9%,5100,Empirically Validated
+2024-11,US Census Bureau (MRTS),MRTS-44-45,Monthly Retail & Food Services,All Retailing,732410.00,+1.9%,12500,Empirically Validated
+2024-11,US Census Bureau (MRTS),MRTS-443,Electronics and Appliance Stores,Electronics,8950.00,+10.2%,3400,Empirically Validated
+2024-11,US Census Bureau (MRTS),MRTS-448,Clothing and Clothing Accessories,Apparel,29400.00,+9.3%,4800,Empirically Validated
+2024-09,UK Office for National Statistics (ONS),ONS-RSI-VOL,Retail Sales Volume Index,All Retailing,103.20,+0.3%,5000,Statistically Consistent
+2024-10,UK Office for National Statistics (ONS),ONS-RSI-VOL,Retail Sales Volume Index,All Retailing,102.50,-0.7%,5000,Statistically Consistent
+2024-11,UK Office for National Statistics (ONS),ONS-RSI-VOL,Retail Sales Volume Index,All Retailing,104.10,+1.6%,5000,Statistically Consistent
+2024-09,Ministry of Statistics & PI (MoSPI - India),OGD-CPI-RET,Consumer Price & Retail Index,Consumer Goods,191.20,+5.49%,1180,Government Validated
+2024-10,Ministry of Statistics & PI (MoSPI - India),OGD-CPI-RET,Consumer Price & Retail Index,Consumer Goods,194.80,+6.21%,1180,Government Validated
+2024-11,Ministry of Statistics & PI (MoSPI - India),OGD-CPI-RET,Consumer Price & Retail Index,Consumer Goods,193.10,+5.48%,1180,Government Validated
+2024-09,Eurostat European Union,NACE-G47,Volume of Retail Trade Index,Retail Non-Food,101.40,+0.5%,18000,Verified Benchmark
+2024-10,Eurostat European Union,NACE-G47,Volume of Retail Trade Index,Retail Non-Food,101.90,+0.5%,18000,Verified Benchmark
+2024-11,Eurostat European Union,NACE-G47,Volume of Retail Trade Index,Retail Non-Food,103.20,+1.3%,18000,Verified Benchmark
