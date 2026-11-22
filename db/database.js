@@ -2,7 +2,10 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const DB_PATH = path.join(__dirname, '..', 'data', 'retailpulse.db');
+const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const DB_PATH = isVercel
+  ? path.join('/tmp', 'retailpulse.db')
+  : path.join(__dirname, '..', 'data', 'retailpulse.db');
 
 let db;
 
@@ -13,10 +16,10 @@ function getDb() {
 
 async function initDb() {
   const fs = require('fs');
-  const dataDir = path.join(__dirname, '..', 'data');
+  const dataDir = isVercel ? '/tmp' : path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   
-  const uploadsDir = path.join(__dirname, '..', 'uploads');
+  const uploadsDir = isVercel ? path.join('/tmp', 'uploads') : path.join(__dirname, '..', 'uploads');
   if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
   db = new Database(DB_PATH);

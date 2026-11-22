@@ -56,6 +56,24 @@ wss.on('connection', (ws, req) => {
   ws.on('error', (err) => console.error('WS error:', err));
 });
 
+// Ensure DB is initialized for serverless and normal environments
+let dbReady = false;
+let dbInitPromise = null;
+
+function ensureDb() {
+  if (!dbInitPromise) {
+    dbInitPromise = initDb().then(() => { dbReady = true; });
+  }
+  return dbInitPromise;
+}
+
+app.use(async (req, res, next) => {
+  if (!dbReady) {
+    await ensureDb();
+  }
+  next();
+});
+
 // Broadcast to all connected WebSocket clients
 function broadcast(channel, data) {
   const payload = JSON.stringify({ type: 'update', channel, data, timestamp: new Date().toISOString() });
@@ -69,12 +87,16 @@ function broadcast(channel, data) {
 // Make broadcast globally available
 global.wsBroadcast = broadcast;
 
-// Initialize DB, then start server
-initDb().then(() => {
-  const PORT = process.env.PORT || 3000;
-  server.listen(PORT, () => {
-    console.log(`\n🚀 RetailPulse Server running on http://localhost:${PORT}`);
-    console.log(`📡 WebSocket ready on ws://localhost:${PORT}`);
-    startKpiSimulator();
+// Start server when executed directly (or non-serverless)
+if (require.main === module || !process.env.VERCEL) {
+  ensureDb().then(() => {
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, () => {
+      console.log(`\n🚀 RetailPulse Server running on http://localhost:${PORT}`);
+      console.log(`📡 WebSocket ready on ws://localhost:${PORT}`);
+      startKpiSimulator();
+    });
   });
-});
+}
+
+module.exports = app;
