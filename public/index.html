@@ -104,8 +104,14 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: document.getElementById('login-username').value, password: document.getElementById('login-password').value })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (_) {
+          throw new Error(`Backend unavailable (Status: ${res.status}). Serverless function routing initializing...`);
+        }
+        if (!res.ok) throw new Error(data.error || 'Authentication failed');
         localStorage.setItem('rp_token', data.token);
         localStorage.setItem('rp_user', JSON.stringify(data.user));
         window.location.href = '/dashboard.html';
@@ -133,8 +139,14 @@
             role: document.getElementById('reg-role').value
           })
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (_) {
+          throw new Error(`Backend unavailable (Status: ${res.status}). Serverless function routing initializing...`);
+        }
+        if (!res.ok) throw new Error(data.error || 'Registration failed');
         localStorage.setItem('rp_token', data.token);
         localStorage.setItem('rp_user', JSON.stringify(data.user));
         window.location.href = '/dashboard.html';

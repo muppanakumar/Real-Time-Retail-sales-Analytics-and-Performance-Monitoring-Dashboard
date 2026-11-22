@@ -113,7 +113,13 @@ async function api(endpoint, options = {}) {
       logout();
       return null;
     }
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      console.warn(`Non-JSON response from /api${endpoint}:`, text.slice(0, 80));
+      return null;
+    }
   } catch (err) {
     console.error('API Error:', endpoint, err);
     return null;

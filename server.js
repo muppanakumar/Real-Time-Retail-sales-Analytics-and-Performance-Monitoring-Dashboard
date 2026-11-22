@@ -20,10 +20,15 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// Routes (support both /api/* and root paths for Vercel Serverless Functions)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
 app.use('/api/data', dataRoutes);
+app.use('/data', dataRoutes);
+
 app.use('/api/upload', uploadRoutes);
+app.use('/upload', uploadRoutes);
 
 // WebSocket clients store
 const clients = new Map();
